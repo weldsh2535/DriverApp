@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="detail"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{this.customerName}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+<ion-grid>
+  <ion-row *ngFor="let message of listOfMessage">
+   <ion-col size="9"  *ngIf="currentUser !== message.sessionId"  class="message other-message">
+     <b>{{message.user}}</b>
+     <span>{{message.msgcontent}}</span>
+     <div class="time" text-right><br>
+     {{message.date|date:'short'}}
+     </div>
+   </ion-col>
+   <ion-col offset="3" size="9" *ngIf="currentUser === message.sessionId" class="message my-message">
+    <b>{{message.user}}</b>
+    <span>{{message.msgcontent}}</span>
+    <div class="time" text-right><br>
+    {{message.date|date:'short'}}
+    </div>
+  </ion-col>
+  </ion-row>
+</ion-grid>
+<ion-footer>
+  <ion-toolbar >
+   <ion-row align-items-center no-padding>
+     <ion-col size="10">
+       <textarea autosize maxRows="4" [(ngModel)]="newMsg" class="message-input"></textarea>
+     </ion-col>
+     <ion-col size="2">
+      <ion-button expand="block" fill="clear" color="primary" [disabled]="newMsg===''"
+      class="msg-btn" (click)="sendMessage()">
+      <ion-icon name="send-outline"></ion-icon>
+    </ion-button>
+    </ion-col>
+   </ion-row>
+  </ion-toolbar>
+</ion-footer>
+</ion-content>

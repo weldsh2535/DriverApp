@@ -1,0 +1,76 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Driver Home</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true" #pageTop scrollEvents="true"  (ionScroll)="onScroll($event)">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <div class="message" *ngIf="massge" >
+    <ion-grid >
+      <ion-row>
+        <ion-label>{{message}}</ion-label>
+      </ion-row>
+    </ion-grid>
+  </div>
+  <div class="orders">
+    <ion-row *ngFor="let meal of listOfOrder ; let i = index" class="ion-padding meal-row">
+      <ion-col size="6" class="border-bottom">
+        <ion-label>
+          {{ meal.restaurantName }}
+          <p>{{ meal.DateTime|date:'short'}}</p>
+          <span>
+            <ion-button (click)="location(meal.RLocation)">
+              <ion-icon name="location-outline"></ion-icon>
+            </ion-button>
+          </span>
+          <p
+            style="background-color: #f8f9fa; border-radius: 5px; padding-top: 3px; padding-left: 7px; margin-top: 5px;">
+            {{meal.restaurantStatus}}</p>
+        </ion-label>
+        <ion-label color="dark"><b>Total : {{ meal.Total | currency:'ETB' }}</b></ion-label>
+        <ion-button fill="clear" (click)="viewOrder(meal.id)">
+          view order
+        </ion-button>
+      </ion-col>
+      <ion-col size="6" class="border-bottom">
+        <ion-label>
+          {{ meal.Customer }}
+          <p>{{ meal.PhoneNumber }}</p>
+          <span>
+            <ion-button (click)="location(meal.CLocation)">
+              <ion-icon name="location-outline"></ion-icon>
+            </ion-button>
+          </span>
+        </ion-label>
+        <ion-row class="status">
+          <ion-label style="padding-top: 9px; padding-left: 5px;">Status</ion-label>
+          <ion-select interface="popover" (ionChange)="companyFormSelected($event,meal)">
+            <ion-select-option *ngFor="let value of meal.OrderStatus ;let j=index " [disabled]="setDisabled(value)"
+              [value]="value.val">
+              {{value.val}}
+            </ion-select-option>
+          </ion-select>
+        </ion-row>
+        <button style="
+          background-color: #2185d0;
+          border-color: #2185d0;
+          color: #fff;
+          border-radius: 0.28571429rem;
+          margin: .25rem .5rem .25rem 0;
+        " (click)="sendMessage(meal.Driver,meal.CustomerId,meal.Customer)">
+          Send message
+        </button>
+      </ion-col>
+    </ion-row>
+  </div>
+  <ion-fab horizontal="end" vertical="bottom" slot="fixed">
+    <ion-fab-button color="light" (click)="pageScroller()">
+      <ion-icon md="chevron-up-outline" ios="chevron-up-circle-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

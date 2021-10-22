@@ -1,0 +1,51 @@
+
+ion-toolbar {
+    ion-icon {
+      font-size: 25px;
+    }
+  }
+  
+  ion-content {
+    position: absolute;
+    --padding-bottom: 50px;
+      .orders{
+        margin-top: 58px;
+      }
+    }
+   
+  .light-bg {
+      background: #ffffff;
+      z-index: 10;
+  }
+   
+  
+  .meal-row {
+    padding-bottom: 0px;
+  }
+  .border-bottom {
+    border-bottom: 1px solid var(--ion-color-step-150, rgba(0, 0, 0, 0.07));
+  }
+  #map {
+    width: 60%;
+    height: 280px;
+  }
+  ion-row .status{
+    background-color: #dee2e6;
+    border-radius: 3px;
+    margin-top: 4px;
+}
+ion-button{
+    margin-top: 2px;
+}
+ion-row{
+  border-radius: 12px;
+  background-color: #e9ecef;
+  margin-top: 4px;
+}
+//to message of order 
+.message{
+  padding-top: 60px;
+  padding-left: 12px;
+ // color: #337ab7;
+  font-size: 27px;
+}
