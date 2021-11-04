@@ -292,8 +292,7 @@ export class DriverHomePage implements OnInit {
   }
   viewOrder(id) {
     this.cart = [];
-    let orderNo = this.listOfOrder.find(c => c.id == id).orderNo;
-    let orderDetails = this.listOfOrderDetails.filter(c => c.orderId == orderNo);
+    let orderDetails = this.listOfOrderDetails.filter(c => c.orderId == id);
     orderDetails.forEach(el => {
       let data = {
         CookingTime: this.listOfFood.find(c => c.id == el.foodId).cookingTime,

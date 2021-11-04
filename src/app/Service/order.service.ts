@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { SharedService } from './shared.service';
 import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class OrderService {
   amount: number;
   private order=[];
   private orderItemCount  = new BehaviorSubject(0);
-  readonly APIURL = 'http://localhost:49347/api';
+  readonly APIURL = environment.apiURL;
   constructor( private http: HttpClient,
     private sharedService: SharedService) {
 }

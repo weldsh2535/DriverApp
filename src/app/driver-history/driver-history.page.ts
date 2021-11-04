@@ -42,6 +42,7 @@ export class DriverHistoryPage implements OnInit {
   endMonth: number;
   endYear: number;
   endDate: number;
+  increament: number;
   constructor(private orderService: OrderService,
     private accountService: AccountService,
     private restaurantService: RestaurantService,
@@ -214,28 +215,64 @@ export class DriverHistoryPage implements OnInit {
               const yearlyOrdes = new Date(element.dateTime).getFullYear();
               //  console.log("date  =="+dateOfOrders + "month==" +monthlyOrders +"year=="+yearlyOrdes);
               if (event == "daily") {
+                this.increament = 0;
                 if (date == dateOfOrders) {
+                  this.increament = this.increament+1;
                   this.listOfOrder.push(data);
                   this.listOfOrder.sort((a, b) => new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime());
+                }
+                if(this.increament == 0){
+                  this.massge = true
+                  this.message = "no orders in this daily"
+                }
+                else{
+                  this.massge = false
                 }
               }
               else if (event == "week") {
+                this.increament = 0;
                 if (this.startDate <= this.orderDate && this.startMonth == this.orderMonth && this.startYear == this.orderYear
                   && this.endDate>=this.orderDate && this.endMonth == this.orderMonth && this.endYear == this.orderYear){
+                  this.increament = this.increament+1;
                   this.listOfOrder.push(data);
                   this.listOfOrder.sort((a, b) => new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime());
+                }
+                if(this.increament == 0){
+                  this.massge = true
+                  this.message = "no orders in this week"
+                }
+                else{
+                  this.massge = false
                 }
               }
               else if (event == "month") {
+                this.increament = 0;
                 if (date == monthlyOrders) {
+                  this.increament = this.increament+1;
                   this.listOfOrder.push(data);
                   this.listOfOrder.sort((a, b) => new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime());
                 }
+                if(this.increament == 0){
+                  this.massge = true
+                  this.message = "no orders in this month"
+                }
+                else{
+                  this.massge = false
+                }
               }
               else if (event == "year") {
+                this.increament = 0;
                 if (date == yearlyOrdes) {
+                  this.increament = this.increament+1;
                   this.listOfOrder.push(data);
                   this.listOfOrder.sort((a, b) => new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime());
+                }
+                if(this.increament == 0){
+                  this.massge = true
+                  this.message = "no orders in this year"
+                }
+                else{
+                  this.massge = false
                 }
               }
             });

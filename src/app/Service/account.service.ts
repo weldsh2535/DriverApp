@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { AppError } from '../common/app-error';
 import { BadInput } from '../common/bad-input';
 import { NotFoundError } from '../common/not-found-error';
@@ -10,7 +11,7 @@ import { NotFoundError } from '../common/not-found-error';
 })
 export class AccountService {
 
-  readonly APIURL = 'http://localhost:49347/api';
+  readonly APIURL = environment.apiURL;
   constructor( private http: HttpClient) {
   }
   create(val: any) {
@@ -37,15 +38,5 @@ export class AccountService {
 
     return Observable.throw(new AppError(error));
   }
-  // getAccountById(id){
-  //   const accountObj = this.db.collection('Account', ref => ref.where('id', '==', id)).snapshotChanges();
-  //   this.accountList = accountObj.pipe(
-  //     map(changes => changes.map(a => {
-  //       const data = a.payload.doc.data() as Account;
-  //       const id = a.payload.doc.id;
-  //       return { id, ...data };
-  //     }))
-  //   );
-  //   return this.accountList;
-  // }
+
 }
