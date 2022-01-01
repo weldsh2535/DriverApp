@@ -1,51 +1,83 @@
-
 ion-toolbar {
-    ion-icon {
-      font-size: 25px;
-    }
+  ion-icon {
+    font-size: 25px;
   }
-  
-  ion-content {
-    position: absolute;
-    --padding-bottom: 50px;
-      .orders{
-        margin-top: 58px;
-      }
-    }
-   
-  .light-bg {
-      background: #ffffff;
-      z-index: 10;
-  }
-   
-  
-  .meal-row {
-    padding-bottom: 0px;
-  }
-  .border-bottom {
-    border-bottom: 1px solid var(--ion-color-step-150, rgba(0, 0, 0, 0.07));
-  }
-  #map {
-    width: 60%;
-    height: 280px;
-  }
-  ion-row .status{
-    background-color: #dee2e6;
-    border-radius: 3px;
-    margin-top: 4px;
 }
-ion-button{
-    margin-top: 2px;
+
+ion-content {
+  position: absolute;
+  --padding-bottom: 50px;
+  .orders {
+    margin-top: 58px;
+  }
 }
-ion-row{
+
+.light-bg {
+  background: #ffffff;
+  z-index: 10;
+}
+
+.meal-row {
+  padding-bottom: 0px;
+}
+.border-bottom {
+  border-bottom: 1px solid var(--ion-color-step-150, rgba(0, 0, 0, 0.07));
+}
+#map {
+  width: 60%;
+  height: 280px;
+}
+ion-row .status {
+  background-color: #dee2e6;
+  border-radius: 3px;
+  margin-top: 4px;
+}
+ion-button {
+  margin-top: 2px;
+}
+ion-row {
   border-radius: 12px;
   background-color: #e9ecef;
   margin-top: 4px;
 }
-//to message of order 
-.message{
-  padding-top: 60px;
+//to message of order
+ion-row .message {
+  padding-top: 19px;
+  padding-left: 107px;
+}
+ion-button {
+  padding-left: 0px;
+}
+ion-grid .message {
+  border-radius: 9px;
+  background-color: whitesmoke;
+  height: 139px;
+  margin-top: 60px;
+}
+ion-label .message {
+  padding-left: 60px;
+  padding-top: 24px;
+  text-align: center;
+  font-size: 28px;
+  font-style: initial;
+  font-family: cursive;
+}
+.message {
+  padding-top: 70px;
   padding-left: 12px;
- // color: #337ab7;
+  color: #337ab7;
   font-size: 27px;
+}
+.location-visible {
+  opacity: 1;
+  transition: 0.5s;
+}
+.location-hidden {
+  opacity: 0;
+  transition: 0.5s;
+}
+#restaurant-info{
+    border-radius: 6px;
+    background-color: gainsboro;
+    margin-left: -12px;
 }

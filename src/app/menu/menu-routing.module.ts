@@ -24,12 +24,12 @@ const routes: Routes = [
         loadChildren: () => import('../driver-history/driver-history.module').then(m => m.DriverHistoryPageModule)
       },
       {
-        path: 'order-history',
-        loadChildren: () => import('../order-history/order-history.module').then(m => m.OrderHistoryPageModule)
-      },
-      {
         path: 'profile',
         loadChildren: () => import('../profile/profile.module').then( m => m.ProfilePageModule)
+      },
+      {
+        path: 'order-history',
+        loadChildren: () => import('../order-history/order-history.module').then(m => m.OrderHistoryPageModule)
       },
       {
         path: '',

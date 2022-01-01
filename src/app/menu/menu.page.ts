@@ -24,6 +24,7 @@ export class MenuPage implements OnInit {
   usePicker: boolean;
   listOfAccount: Account[];
   base64textString: string;
+  loader: any;
   constructor(private authServices: AuthService,
     private router: Router,
     private alertCtrl: AlertController,
@@ -32,7 +33,7 @@ export class MenuPage implements OnInit {
     private accountService: AccountService,
     private platform: Platform) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     if ((this.platform.is('mobile') && !this.platform.is('hybrid')) ||
       this.platform.is('desktop')
     ) {
@@ -45,30 +46,33 @@ export class MenuPage implements OnInit {
     this.ListOfMenu1 = [
       { title: 'driver', url: '/driver', icon: 'bus' },
       { title: 'location', url: '/location', icon: 'locate' },
-      { title: 'Home', url: '/driver-home', icon: 'home' },
-      { title: 'Orders', url: '/driver-history', icon: 'cart' },
-      { title:'profile',url:'/profile',icon:'person'}
-    ]; 
+      { title: 'Driver Home', url: '/driver-home', icon: 'home' },
+      { title: 'Driver Orders', url: '/driver-history', icon: 'cart' },
+      { title: 'profile', url: '/profile', icon: 'person' }
+    ];
     this.getRoute();
     this.getAccount();
   }
   getAccount() {
-    this.accountService.getAllAccount().subscribe(res => {
+    this.accountService.getAllAccount().subscribe(async res => {
       this.listOfAccount = res;
-      this.base64textString = res.find(c => c.id == localStorage.getItem("userId")).photo;
+      this.base64textString = res.find(c => c.id == +localStorage.getItem("userId")).photo;
+    }, async (err) => {
+      await this.loader.dismiss().then();
+      console.log(err);
     })
   }
-  
+
   getRoute() {
     this.functionalityService.getAllFunctionality().subscribe(result => {
       this.listOfFunctionality = result;
-      console.log(result)
+      // console.log(result)
       if (result.length > 0) {
         this.roleType = localStorage.getItem("roleType");
         this.userName = localStorage.getItem("fullName");
-        console.log(this.userName)
+        //  console.log(this.userName)
         this.userRoleService.getAllUserRole().subscribe(res => {
-          console.log(res)
+          //console.log(res)
           let result = res.filter(c => c.userId == this.roleType);
           let active = localStorage.getItem("active");
           if (result.length > 0 && active == "true") {
@@ -79,7 +83,7 @@ export class MenuPage implements OnInit {
                 let rol = this.ListOfMenu1.filter(c => c.title == isFound[0].compName)[0];
                 if (rol) {
                   let y = {
-                    title: isFound[0].compName,
+                    title: isFound[0].description,
                     url: rol.url,
                     icon: rol.icon
                   }

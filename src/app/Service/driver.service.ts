@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { Driver } from 'src/Table/table';
 import { AppError } from '../common/app-error';
 import { BadInput } from '../common/bad-input';
 import { NotFoundError } from '../common/not-found-error';
@@ -11,19 +12,19 @@ import { NotFoundError } from '../common/not-found-error';
 })
 export class DriverService {
   readonly APIURL = environment.apiURL;
-  constructor( private http: HttpClient) {
+  constructor(private http: HttpClient) {
   }
   create(val: any) {
-    return this.http.post(this.APIURL + '/Driver', val);
+    return this.http.post(this.APIURL + '/driver', val);
   }
-  getAllDriver(): Observable<any[]> {
-    return this.http.get<any>(this.APIURL + '/Driver');
+  getAllDriver(): Observable<Driver[]> {
+    return this.http.get<Driver[]>(this.APIURL + '/driver');
   }
   updateDriver(val: any) {
-    return this.http.put(this.APIURL + '/Driver/', val);
+    return this.http.put(this.APIURL + '/driver/', val);
   }
   removeDriver(id) {
-    return this.http.delete(this.APIURL + '/Driver/' + id).toPromise();
+    return this.http.delete(this.APIURL + '/driver/' + id).toPromise();
   }
 
   private handleError(error: Response) {

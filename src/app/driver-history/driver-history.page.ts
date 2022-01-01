@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { IonContent, LoadingController } from '@ionic/angular';
 import { Order, Restaurant } from 'src/Table/table';
 import { AccountService } from '../Service/account.service';
 import { OrderService } from '../Service/order.service';
@@ -43,10 +44,17 @@ export class DriverHistoryPage implements OnInit {
   endYear: number;
   endDate: number;
   increament: number;
+  loader: HTMLIonLoadingElement;
+  @ViewChild('pageTop') pageTop: IonContent
+  showScroll: boolean = false;
+  public pageScroller() {
+    this.pageTop.scrollToTop();
+  }
   constructor(private orderService: OrderService,
     private accountService: AccountService,
     private restaurantService: RestaurantService,
-    public datepipe: DatePipe) {
+    public datepipe: DatePipe,
+    private loadingController: LoadingController) {
     //this.currentDate = new Date().toDateString();
     this.currentMonth = new Date().getMonth() + 1;
     this.currentYear = new Date().getFullYear();
@@ -60,9 +68,15 @@ export class DriverHistoryPage implements OnInit {
     })
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.loader = await this.loadingController.create({
+      message: 'Getting Products ...',
+      spinner: "bubbles",
+      animated: true
+    });
+    await this.loader.present().then();
     this.model.startdate = new Date();
-   // debugger;
+    // debugger;
     this.getOrderByDriverId();
     this.getRestaurant();
     this.searchdate();
@@ -85,13 +99,17 @@ export class DriverHistoryPage implements OnInit {
     this.startMonth = new Date(this.startdateofweek).getMonth() + 1;
     this.startYear = new Date(this.startdateofweek).getFullYear();
     this.startDate = new Date(this.startdateofweek).getDate();
-    console.log(this.startdateofweek)
+    // console.log("Start date of the week "+this.startdateofweek)
+    // console.log("Start of the Date "+this.startDate)
+    // console.log("Start of the Month "+this.startMonth)
     this.Enddateofweek = this.datepipe.transform(endofweek(dt));
     //convertion of currentEndDate
     this.endMonth = new Date(this.Enddateofweek).getMonth() + 1;
     this.endYear = new Date(this.Enddateofweek).getFullYear();
     this.endDate = new Date(this.Enddateofweek).getDate();
-    console.log(this.Enddateofweek)
+    // console.log("End of the week "+this.Enddateofweek)
+    // console.log("End of the Date " + this.endDate)
+    // console.log("End of the Month " + this.endMonth)
     function addDays(date, days) {
       const find = new Date(Number(date))
       find.setDate(date.getDate() + days)
@@ -107,28 +125,33 @@ export class DriverHistoryPage implements OnInit {
     this.Sun = this.datepipe.transform(endofweek(dt), 'EEEE, MMMM d');
   }
   getRestaurant() {
-    this.restaurantService.getAllRestaurant().subscribe(res => {
+    this.restaurantService.getAllRestaurant().subscribe(async res => {
+      await this.loader.dismiss().then();
       this.listOfRestaurant = res;
+    }, async (err) => {
+      await this.loader.dismiss().then();
+      console.log(err);
     })
   }
   getOrderByDriverId() {
     this.listOfOrder = [];
     let userId = localStorage.getItem("userId");
-    this.orderService.getAllOrder().subscribe(result => {
+    this.orderService.getAllOrder().subscribe(async result => {
+      await this.loader.dismiss().then();
       let res = result.filter(c => c.driver == userId);
       if (res.length > 0) {
         let order = res.filter(c => c.orderStatuses.find(c => c.isChecked == true && c.val == "delivered"))
         if (order.length > 0 && this.listOfRestaurant != undefined) {
           order.forEach(element => {
             this.accountService.getAllAccount().subscribe(result => {
-              let restaurant = this.listOfRestaurant.find(c => c.id == element.restaurantId)
+              let restaurant = this.listOfRestaurant.find(c => c.accountId == +element.restaurantId)
               let data = {
                 id: element.id,
                 restaurantName: restaurant.name,
                 DateTime: element.dateTime,
-                Customer: result.find(c => c.id == element.customer).fullName,
-                PhoneNumber: result.find(c => c.id == element.customer).phonenumber,
-                CLocation: result.find(c => c.id == element.customer).location,
+                Customer: result.find(c => c.id == +element.customer).fullName,
+                PhoneNumber: result.find(c => c.id == +element.customer).phonenumber,
+                CLocation: result.find(c => c.id == +element.customer).locationId,
                 RLocation: element.location,
                 OrderStatus: element.orderStatuses,
                 Total: element.total,
@@ -151,6 +174,9 @@ export class DriverHistoryPage implements OnInit {
         this.massge = true
         this.message = "no order history"
       }
+    }, async (err) => {
+      await this.loader.dismiss().then();
+      console.log(err);
     });
   }
   getRefresh() {
@@ -171,6 +197,7 @@ export class DriverHistoryPage implements OnInit {
       this.scheduleOrder(this.currentDate, "daily");
     }
     else if (ev.detail.value == "week") {
+      console.log(ev.detail.value)
       this.scheduleOrder(this.currentWeek, "week");
     }
     else if (ev.detail.value == "month") {
@@ -183,21 +210,22 @@ export class DriverHistoryPage implements OnInit {
   scheduleOrder(date, event) {
     this.listOfOrder = [];
     let userId = localStorage.getItem("userId");
-    this.orderService.getAllOrder().subscribe(result => {
+    this.orderService.getAllOrder().subscribe(async result => {
+      await this.loader.dismiss().then();
       let res = result.filter(c => c.driver == userId);
       if (res.length > 0) {
         let order = res.filter(c => c.orderStatuses.find(c => c.isChecked == true && c.val == "delivered"))
         if (order.length > 0 && this.listOfRestaurant != undefined) {
           order.forEach(element => {
             this.accountService.getAllAccount().subscribe(result => {
-              let restaurant = this.listOfRestaurant.find(c => c.id == element.restaurantId)
+              let restaurant = this.listOfRestaurant.find(c => c.accountId == +element.restaurantId)
               let data = {
                 id: element.id,
                 restaurantName: restaurant.name,
                 DateTime: element.dateTime,
-                Customer: result.find(c => c.id == element.customer).fullName,
-                PhoneNumber: result.find(c => c.id == element.customer).phonenumber,
-                CLocation: result.find(c => c.id == element.customer).location,
+                Customer: result.find(c => c.id == +element.customer).fullName,
+                PhoneNumber: result.find(c => c.id == +element.customer).phonenumber,
+                CLocation: result.find(c => c.id == +element.customer).locationId,
                 RLocation: element.location,
                 OrderStatus: element.orderStatuses,
                 Total: element.total,
@@ -215,63 +243,55 @@ export class DriverHistoryPage implements OnInit {
               const yearlyOrdes = new Date(element.dateTime).getFullYear();
               //  console.log("date  =="+dateOfOrders + "month==" +monthlyOrders +"year=="+yearlyOrdes);
               if (event == "daily") {
-                this.increament = 0;
                 if (date == dateOfOrders) {
-                  this.increament = this.increament+1;
                   this.listOfOrder.push(data);
                   this.listOfOrder.sort((a, b) => new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime());
                 }
-                if(this.increament == 0){
+                if (this.listOfOrder.length == 0) {
                   this.massge = true
                   this.message = "no orders in this daily"
                 }
-                else{
+                else {
                   this.massge = false
                 }
               }
               else if (event == "week") {
-                this.increament = 0;
                 if (this.startDate <= this.orderDate && this.startMonth == this.orderMonth && this.startYear == this.orderYear
-                  && this.endDate>=this.orderDate && this.endMonth == this.orderMonth && this.endYear == this.orderYear){
-                  this.increament = this.increament+1;
+                  && this.endDate >= this.orderDate && this.endMonth == this.orderMonth && this.endYear == this.orderYear) {
                   this.listOfOrder.push(data);
                   this.listOfOrder.sort((a, b) => new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime());
                 }
-                if(this.increament == 0){
+                if (this.listOfOrder.length == 0) {
                   this.massge = true
                   this.message = "no orders in this week"
                 }
-                else{
+                else {
                   this.massge = false
                 }
               }
               else if (event == "month") {
-                this.increament = 0;
                 if (date == monthlyOrders) {
-                  this.increament = this.increament+1;
                   this.listOfOrder.push(data);
                   this.listOfOrder.sort((a, b) => new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime());
                 }
-                if(this.increament == 0){
+                if (this.listOfOrder.length == 0) {
                   this.massge = true
                   this.message = "no orders in this month"
                 }
-                else{
+                else {
                   this.massge = false
                 }
               }
               else if (event == "year") {
-                this.increament = 0;
                 if (date == yearlyOrdes) {
-                  this.increament = this.increament+1;
                   this.listOfOrder.push(data);
                   this.listOfOrder.sort((a, b) => new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime());
                 }
-                if(this.increament == 0){
+                if (this.listOfOrder.length == 0) {
                   this.massge = true
                   this.message = "no orders in this year"
                 }
-                else{
+                else {
                   this.massge = false
                 }
               }
@@ -286,6 +306,14 @@ export class DriverHistoryPage implements OnInit {
         this.massge = true
         this.message = "no order history"
       }
+    }, async (err) => {
+      await this.loader.dismiss().then();
+      console.log(err);
     });
+  }
+  onScroll(ev) {
+    const offset = ev.detail.scrollTop;
+    //console.log(offset);
+    this.showScroll = offset > 300;
   }
 }

@@ -27,7 +27,6 @@ export class RestMenu {
     deliveryTime: string;
     avaliable: string;
     favourite: string;
-
 }
 export class Driver {
     id: number;
@@ -87,11 +86,13 @@ export class Account {
     locationId: number; // Restaurant
     active: string;
     type: string;
+    photo: string;
 }
 export class Order {
     id: number;
     restaurantId: string; // Restaurant
     dateTime: string;
+    deliveryTime: string;
     customer: string; //
     location: any; // Restaurant
     orderStatuses: any; // picked,start moving, delivered(finished)
@@ -110,14 +111,12 @@ export class OrderDetail {
     qty: number;
     price: number;
 }
-// tslint:disable-next-line:class-name
 export class userRole {
     id: number;
     funId: string;
     userId: string;
     remark: string;
 }
-// tslint:disable-next-line:class-name
 export class functionality {
     id: number;
     compName: string;
@@ -129,4 +128,12 @@ export class Category {
     categoryName: string;
     description: string;
     image: string;
+}
+export class message {
+    id: string
+    sessionId: string
+    msgcontent: string
+    date: number
+    userId: string
+    driverId: string
 }

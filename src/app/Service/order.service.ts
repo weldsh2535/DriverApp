@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { SharedService } from './shared.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { Order } from 'src/Table/table';
 
 @Injectable({
   providedIn: 'root'
@@ -13,37 +14,40 @@ export class OrderService {
   RestaurantId = new BehaviorSubject<any>({});
   orderStatus = new BehaviorSubject<any>({});
   amount: number;
-  private order=[];
-  private orderItemCount  = new BehaviorSubject(0);
+  private order = [];
+  private orderItemCount = new BehaviorSubject(0);
   readonly APIURL = environment.apiURL;
-  constructor( private http: HttpClient,
+  constructor(private http: HttpClient,
     private sharedService: SharedService) {
-}
-  create(val: any) {
-    return this.http.post(this.APIURL + '/Order', val);
   }
-  getAllOrder(): Observable<any[]> {
-    return this.http.get<any>(this.APIURL + '/Order');
+  create(val: any) {
+    return this.http.post(this.APIURL + '/order', val);
+  }
+  getAllOrder(): Observable<Order[]> {
+    return this.http.get<Order[]>(this.APIURL + '/order');
+  }
+  getOrderByDate(date):Observable<Order[]> {
+    return this.http.get<Order[]>(this.APIURL + '/order/'+date)
   }
   updateOrder(val: any) {
-    return this.http.put(this.APIURL + '/Order/', val);
+    return this.http.put(this.APIURL + '/order/', val);
   }
   removeOrder(id) {
-    return this.http.delete(this.APIURL + '/Order/' + id).toPromise();
+    return this.http.delete(this.APIURL + '/order/' + id).toPromise();
   }
-  updateOrderStatus(val:any){
-    return this.http.put(this.APIURL + '/OrderStatus/', val);
+  updateOrderStatus(val: any) {
+    return this.http.put(this.APIURL + '/orderstatus/', val);
   }
   getCart() {
     return this.cart;
   }
-  getOrders(){
+  getOrders() {
     return this.order;
   }
   getCartItemCount() {
     return this.cartItemCount;
   }
-  getOrderItemCount(){
+  getOrderItemCount() {
     return this.orderItemCount;
   }
   getRestaurantId() {
@@ -53,15 +57,15 @@ export class OrderService {
     return this.orderStatus;
   }
   addOrder(items) {
-   this.order =[]
-   this.amount =0;
-    this.order.forEach(el=>{
-      let index = this.order.indexOf(c=>c.orderDetailsId===el.orderDetailsId)
-      this.order.splice(index,1)
+    this.order = []
+    this.amount = 0;
+    this.order.forEach(el => {
+      let index = this.order.indexOf(c => c.orderDetailsId === el.orderDetailsId)
+      this.order.splice(index, 1)
     });
     this.orderItemCount.next(0);
     items.forEach(element => {
-    this.amount = this.amount + element.amount
+      this.amount = this.amount + element.amount
       let data = {
         CookingTime: element.CookingTime,
         DeliveryTime: element.DeliveryTime,
@@ -73,11 +77,11 @@ export class OrderService {
         id: element.Food,
         picture: element.picture,
         restaurantId: element.restaurantId,
-        type:element.type,
-        orderDetailsId:element.orderDetailsId,
+        type: element.type,
+        orderDetailsId: element.orderDetailsId,
       }
       this.order.push(data);
-      });
+    });
     this.orderItemCount.next(this.orderItemCount.value + this.amount);
   }
   addProduct(product) {

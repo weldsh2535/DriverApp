@@ -11,7 +11,7 @@ import { OrderService } from '../Service/order.service';
 import { RestaurantService } from '../Service/restaurant.service';
 import { SharedService } from '../Service/shared.service';
 import { CallNumber } from '@ionic-native/call-number/ngx';
-import { IonContent } from '@ionic/angular';
+import { IonContent, LoadingController, } from '@ionic/angular';
 @Component({
   selector: 'app-driver-home',
   templateUrl: './driver-home.page.html',
@@ -45,10 +45,12 @@ export class DriverHomePage implements OnInit {
   restaurantStatus: any;
   showLocationDetail = false;
   @ViewChild('pageTop') pageTop: IonContent;
-  currentDate: any;
+  currentDate = new Date().toISOString();
   message: string;
   massge: boolean;
-  increment: number=0;
+  increment: number = 0;
+  loader: HTMLIonLoadingElement;
+  showScroll: boolean = false;
   public pageScroller() {
     this.pageTop.scrollToTop();
   }
@@ -61,10 +63,13 @@ export class DriverHomePage implements OnInit {
     private sharedService: SharedService,
     private restaurantService: RestaurantService,
     private driverservice: DriverService,
-    private callNumber: CallNumber
-    // private _Activatedroute:ActivatedRoute,
+    private callNumber: CallNumber,
+    private loadingController: LoadingController
   ) {
-    this.currentDate = new Date().toDateString();
+    // console.log(new Date(this.currentDate).getDate())
+    // console.log(new Date(this.currentDate).getFullYear())
+    // console.log(new Date(this.currentDate).getMonth())
+    this.currentDate = new Date(this.currentDate).toDateString();
     console.log(this.currentDate);
     this.restaurantService.getAllRestaurant().subscribe(res => {
       this.listOfRestaurant = res;
@@ -73,10 +78,16 @@ export class DriverHomePage implements OnInit {
       this.listOfAccount = res;
     });
   }
-
-  ngOnInit() {
+  async ngOnInit() {
+    this.loader = await this.loadingController.create({
+      message: 'loading ...',
+      spinner: "bubbles",
+      animated: true
+    });
+    await this.loader.present().then();
     this.regform = this.fb.group({
       status: [""],
+      currentDate: [""]
     })
     this.getFood();
     this.getOrder();
@@ -88,45 +99,71 @@ export class DriverHomePage implements OnInit {
     // this.id = this._Activatedroute.snapshot.paramMap.get("id");
     //this.lp = new LocationPicker('map');
   }
-  getDriver() {
-    this.driverservice.getAllDriver().subscribe(res => {
-      this.listOfDriver = res;
+  async getDriver() {
+    this.driverservice.getAllDriver().subscribe(async res => {
+      await this.loader.dismiss().then();
+      this.listOfDriver = await res;
+    }, async (err) => {
+      await this.loader.dismiss().then();
+      console.log(err);
     });
   }
-  getRestaurant() {
-    this.restaurantService.getAllRestaurant().subscribe(res => {
-      this.listOfRestaurant = res;
+
+  async getRestaurant() {
+    this.restaurantService.getAllRestaurant().subscribe(async res => {
+      await this.loader.dismiss().then();
+      this.listOfRestaurant = await res;
+    }, async (err) => {
+      await this.loader.dismiss().then();
+      console.log(err);
     });
   }
-  getFood() {
-    this.foodService.getAllFood().subscribe(res => {
-      this.listOfFood = res;
+  async getFood() {
+    this.foodService.getAllFood().subscribe(async res => {
+      await this.loader.dismiss().then();
+      this.listOfFood = await res;
+    }, async (err) => {
+      await this.loader.dismiss().then();
+      console.log(err);
     });
   }
   // show or hide a location string later
   onScroll(ev) {
     const offset = ev.detail.scrollTop;
     this.showLocationDetail = offset > 40;
+    this.showScroll = offset > 300;
   }
-  getAccount() {
-    this.accountService.getAllAccount().subscribe(res => {
-      this.listOfAccount = res;
+  async getAccount() {
+    this.accountService.getAllAccount().subscribe(async res => {
+      await this.loader.dismiss().then();
+      this.listOfAccount = await res;
+    }, async (err) => {
+      await this.loader.dismiss().then();
+      console.log(err);
     });
   }
-  getOrderDetails() {
-    this.orderDetailsService.getAllOrderDetail().subscribe(res => {
-      this.listOfOrderDetails = res;
+  async getOrderDetails() {
+    this.orderDetailsService.getAllOrderDetail().subscribe(async res => {
+      await this.loader.dismiss().then();
+      this.listOfOrderDetails = await res;
+    }, async (err) => {
+      await this.loader.dismiss().then();
+      console.log(err);
     });
   }
-  getAllOrder() {
-    this.orderService.getAllOrder().subscribe(result => {
-      this.listOfAllOrder = result;
+  async getAllOrder() {
+    this.orderService.getAllOrder().subscribe(async result => {
+      await this.loader.dismiss().then();
+      this.listOfAllOrder = await result;
+    }, async (err) => {
+      await this.loader.dismiss().then();
+      console.log(err);
     });
   }
   setDisabled(meal) {
     return this.dayFinished.includes(meal);
   }
-  companyFormSelected(event, meal) {
+  driverStatus(event, meal) {
     this.driverstatus = [];
     this.status = event.detail.value;
     let status = meal.OrderStatus;
@@ -173,25 +210,30 @@ export class DriverHomePage implements OnInit {
         customerStatus: res.customerStatus,
         statuses: res.statuses
       }
-      this.driverstatus.forEach(ele => {
-        this.orderService.updateOrderStatus(ele).subscribe(res => {
-          //  alert(res.toString());
-        })
-      })
+      // this.driverstatus.forEach(ele => {
+      //   this.orderService.updateOrderStatus(ele).subscribe(res => {
+      //     alert(res.toString());
+      //   })
+      // })
       this.orderService.updateOrder(data).subscribe(res => {
-        //  alert(res.toString());
+        console.log(res.toString());
+        this.getOrder();
       })
     }
   }
-  getOrder() {
+  async getOrder() {
     this.listOfOrder = [];
-    this.orderService.getAllOrder().subscribe(res => {
+    this.orderService.getAllOrder().subscribe(async res => {
+      await this.loader.dismiss().then();
       if (res.length > 0 && this.listOfOrder.length == 0) {
         let sessionId = localStorage.getItem("userId");
-        let driverFound = res.find(c => c.driver == sessionId);
+        //  console.log(sessionId)
+        let driverFound = await res.find(c => c.driver == sessionId);
         if (driverFound) {
           //To filter order based on orderstatus with driver and status of restaurant role 
-          this.order = res.filter(c => c.driver === sessionId && c.orderStatuses.find(c => c.isChecked == false && c.val == "delivered") && c.statuses.find(entry => entry.isChecked == false && entry.val == "Reject"))
+          this.order = await res.filter(c => c.driver === sessionId &&
+            c.orderStatuses.find(c => c.isChecked == false && c.val == "delivered") &&
+            c.statuses.find(entry => entry.isChecked == false && entry.val == "Reject"))
           this.getListOrder();
           this.order = res.filter(c => c.orderStatuses.find(c => c.isChecked == false && c.val == "picked")
             && c.orderStatuses.find(c => c.isChecked == false && c.val == "delivered")
@@ -200,7 +242,7 @@ export class DriverHomePage implements OnInit {
           this.getListOrder();
         }
         else {
-          this.order = res.filter(c => c.orderStatuses.find(c => c.isChecked == false && c.val == "picked")
+          this.order = await res.filter(c => c.orderStatuses.find(c => c.isChecked == false && c.val == "picked")
             && c.orderStatuses.find(c => c.isChecked == false && c.val == "delivered")
             && c.orderStatuses.find(c => c.isChecked == false && c.val == "start moving")
             && c.statuses.find(entry => entry.isChecked == false && entry.val == "Reject"))
@@ -208,86 +250,91 @@ export class DriverHomePage implements OnInit {
         }
 
       }
+    }, async (err) => {
+      await this.loader.dismiss().then();
+      console.log(err);
     })
   }
-  getListOrder() {
-    this.listOfOrder = [];
+  async getListOrder() {
+    //this.listOfOrder = [];
     this.increment = 0;
-    this.order.forEach(element => {
-      this.accountService.getAllAccount().subscribe(result => {
-        if (this.listOfRestaurant != undefined) {
-            let restaurant = this.listOfRestaurant.find(c => c.id == +element.restaurantId)
-            if (restaurant) {
-              for (let i = 0; i < element.restaurantStatuses.length; i++) {
-                if (element.restaurantStatuses[i].isChecked == true) {
-                  this.restaurantStatus = element.restaurantStatuses[i].val
-                }
+    this.order.forEach(async element => {
+      if (this.listOfRestaurant != undefined) {
+        let restaurant = this.listOfRestaurant.find(c => c.accountId == +element.restaurantId)
+        if (restaurant) {
+          for (let i = 0; i < element.restaurantStatuses.length; i++) {
+            if (element.restaurantStatuses[i].isChecked == true) {
+              this.restaurantStatus = element.restaurantStatuses[i].val
+            }
+          }
+          let data = {
+            id: element.id,
+            restaurantName: restaurant.name,
+            DateTime: element.dateTime,
+            Customer: this.listOfAccount.find(c => c.id == +element.customer).fullName,
+            PhoneNumber: this.listOfAccount.find(c => c.id == +element.customer).phonenumber,
+            CLocation: this.listOfAccount.find(c => c.id == +element.customer).locationId,
+            RLocation: element.location,
+            status: element.orderStatuses,
+            OrderStatus: element.orderStatuses,
+            Total: element.total,
+            Driver: element.driver,
+            CustomerId: element.customer,
+            Vehicle: element.vehicle,
+            orderLocation: element.orderLocation,
+            restaurantStatus: this.restaurantStatus
+          }
+          //console.log(element.dateTime)
+          const dateOfOrders = new Date(element.dateTime).toDateString();
+          //console.log(dateOfOrders);
+          if (this.currentDate == dateOfOrders) {
+            await this.listOfOrder.push(data);
+            this.increment = this.increment + 1;
+          }
+          if (this.increment == 0) {
+            this.massge = true
+            this.message = "no orders"
+          }
+          else {
+            this.massge = false
+          }
+          //console.log(this.listOfOrder)
+          this.listOfOrder.sort((a, b) => new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime());
+          let status = element.orderStatuses.find(c => c.isChecked == true);
+          let index = element.orderStatuses.findIndex(c => c.isChecked == true);
+          if (index == 0) {
+            if (status !== undefined) {
+              if (this.dayFinished.includes(status)) {
+                this.dayFinished.splice(this.dayFinished.indexOf(status), 1);
               }
-              let data = {
-                id: element.id,
-                restaurantName: restaurant.name,
-                DateTime: element.dateTime,
-                Customer: result.find(c => c.id == element.customer).fullName,
-                PhoneNumber: result.find(c => c.id == element.customer).phonenumber,
-                CLocation: result.find(c => c.id == element.customer).locationId,
-                RLocation: element.location,
-                status: element.orderStatuses,
-                OrderStatus: element.orderStatuses,
-                Total: element.total,
-                Driver: element.driver,
-                CustomerId: element.customer,
-                Vehicle: element.vehicle,
-                orderLocation: element.orderLocation,
-                restaurantStatus: this.restaurantStatus
+              else {
+                this.dayFinished.push(status);
               }
-              const dateOfOrders = new Date(element.dateTime).toDateString();
-             // console.log(dateOfOrders);
-              if (this.currentDate == dateOfOrders) {
-                this.listOfOrder.push(data);
-                this.increment = this.increment+1;
-                if(this.increment == 0){
-                  this.massge = true
-                  this.message = "no orders"
-                }
-              }
-              //console.log(this.listOfOrder)
-              this.listOfOrder.sort((a, b) => new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime());
-              let status = element.orderStatuses.find(c => c.isChecked == true);
-              let index = element.orderStatuses.findIndex(c => c.isChecked == true);
-              if (index == 0) {
-                if (status !== undefined) {
-                  if (this.dayFinished.includes(status)) {
-                    this.dayFinished.splice(this.dayFinished.indexOf(status), 1);
+              this.setDisabled(status);
+            }
+          }
+          else if (index == 1) {
+            let statusArray = element.orderStatuses;
+            for (let i = 0; i <= statusArray.length; i++) {
+              if (i <= 1) {
+                let statusA = element.orderStatuses[i];
+                if (statusA !== undefined) {
+                  if (this.dayFinished.includes(statusA)) {
+                    this.dayFinished.splice(this.dayFinished.indexOf(statusA), 1);
                   }
                   else {
-                    this.dayFinished.push(status);
+                    this.dayFinished.push(statusA);
                   }
-                  this.setDisabled(status);
-                }
-              }
-              else if (index == 1) {
-                let statusArray = element.orderStatuses;
-                for (let i = 0; i <= statusArray.length; i++) {
-                  if (i <= 1) {
-                    let statusA = element.orderStatuses[i];
-                    if (statusA !== undefined) {
-                      if (this.dayFinished.includes(statusA)) {
-                        this.dayFinished.splice(this.dayFinished.indexOf(statusA), 1);
-                      }
-                      else {
-                        this.dayFinished.push(statusA);
-                      }
-                      this.setDisabled(statusA);
-                    }
-                  }
+                  this.setDisabled(statusA);
                 }
               }
             }
           }
-        else {
-          this.getRefresh();
         }
-      });
+      }
+      else {
+        this.getRefresh();
+      }
     });
   }
   viewOrder(id) {
@@ -320,9 +367,9 @@ export class DriverHomePage implements OnInit {
     this.sharedService.RestaurantLocation.next(location);
     this.router.navigate(["/menu/location"]);
   }
-  sendMessage(driverId, customerId, Customer) {
+  sendMessage(customerId, Customer) {
     this.sharedService.customerName.next(Customer);
-    this.sharedService.deriverId.next(driverId);
+    this.sharedService.deriverId.next(localStorage.getItem("userId"));
     this.sharedService.customerId.next(customerId);
     this.router.navigate(["/message"]);
   }
@@ -330,7 +377,7 @@ export class DriverHomePage implements OnInit {
   doRefresh(event) {
     setTimeout(() => {
       this.getAllOrder();
-      this.getListOrder();
+      //   this.getListOrder();
       event.target.complete();
     }, 2000);
   }

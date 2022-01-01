@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content #pageTop scrollEvents="true" (ionScroll)="onScroll($event)">
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -33,7 +33,7 @@
         </div>  
     </div>  
 </div>  -->
-  <ion-segment  (ionChange)="segmentChanged($event)">
+  <ion-segment (ionChange)="segmentChanged($event)">
     <ion-segment-button value="daily">
       <ion-label>Daily</ion-label>
     </ion-segment-button>
@@ -47,8 +47,8 @@
       <ion-label>Yearly</ion-label>
     </ion-segment-button>
   </ion-segment>
-  <div class="message" *ngIf="massge" >
-    <ion-grid >
+  <div class="message" *ngIf="massge">
+    <ion-grid>
       <ion-row>
         <ion-label>{{message}}</ion-label>
       </ion-row>
@@ -60,21 +60,25 @@
         <ion-label>
           {{ meal.restaurantName }}
           <p>{{ meal.DateTime|date:'short' }}</p>
-          <ion-button fill="clear" >
+          <ion-button fill="clear">
             Delivered
           </ion-button>
         </ion-label>
-       </ion-col>
+      </ion-col>
       <ion-col size="4" class="border-bottom">
         <ion-label>
           {{ meal.Customer }}
           <p>{{ meal.PhoneNumber }}</p>
         </ion-label>
         <p>Payment</p>
-        <ion-label color="dark"
-        ><b> {{ meal.Total | currency:'ETB' }}</b></ion-label
-      >
-     </ion-col>
+        <ion-label color="dark"><b> {{ meal.Total | currency:'ETB' }}</b></ion-label>
+      </ion-col>
     </ion-row>
   </div>
+  <ion-fab horizontal="end" vertical="bottom" slot="fixed"
+    [ngClass]="{'location-visible':showScroll,'location-hidden':!showScroll}">
+    <ion-fab-button color="light" (click)="pageScroller()">
+      <ion-icon md="chevron-up-outline" ios="chevron-up-circle-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

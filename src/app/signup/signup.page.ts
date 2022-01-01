@@ -49,7 +49,7 @@ export class SignupPage implements OnInit {
     }
   }
   login() {
-    this.router.navigate(["/menu/login"]);
+    this.router.navigate(["/login"]);
   }
   async presentAlertConfirm(account: Account) {
     const alert = await this.alertController.create({
