@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/internal/operators/map';
-import { environment } from 'src/environments/environment';
+import { environment } from 'src/environments/environment.prod';
 import { FoodContent } from 'src/Table/table';
 import { AppError } from '../common/app-error';
 import { BadInput } from '../common/bad-input';
