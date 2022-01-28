@@ -3,5 +3,9 @@
   "integrations": {
     "capacitor": {}
   },
-  "type": "angular"
+  "type": "angular",
+    "proxies": [{
+        "path": "/goto",
+        "proxyUrl": "http://hdapi.mtksolutions.com"
+    }]
 }

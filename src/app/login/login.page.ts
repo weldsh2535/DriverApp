@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AlertController, Platform } from '@ionic/angular';
-import { AuthService } from '../Service/auth.service';
+import { AlertController, LoadingController, Platform } from '@ionic/angular';
+import { AccountService } from '../Service/account.service';
 
+import '@capacitor-community/http';
 @Component({
 	selector: 'app-login',
 	templateUrl: './login.page.html',
@@ -14,24 +15,28 @@ export class LoginPage implements OnInit {
 	fieldTextType: boolean;
 	public subscription: any;
 	loader: any;
-	constructor(private authServices: AuthService, private router: Router,
+	constructor(private accountService: AccountService, private router: Router,
 		private alertCtrl: AlertController, private fb: FormBuilder,
-		private platform: Platform) { }
+		private platform: Platform,
+		// private nativeHttp: HTTP,
+		private loadingCtrl: LoadingController,
+		private plt: Platform) { }
 
 	ngOnInit() {
 		this.regform = this.fb.group({
-			email: ["",Validators.compose([Validators.required,Validators.email])],
-			password: ["",Validators.required]
+			email: ["", Validators.compose([Validators.required, Validators.email])],
+			password: ["", Validators.required]
 		})
 	}
 	signIn() {
 		let email = this.regform.get("email").value;
 		let password = this.regform.get("password").value;
 		if (this.regform.valid) {
-			this.authServices.getAllAccount().subscribe(async res => {
+			this.accountService.getAllAccount().subscribe(async res => {
+				//console.log(result)
 				let result = await res.filter(c => c.email == email && c.password == password);
 				if (result.length > 0) {
-					localStorage.setItem("userId", result[0].id);
+					localStorage.setItem("userId", (result[0].id).toString());
 					localStorage.setItem("fullName", result[0].fullName);
 					localStorage.setItem("roleType", result[0].type);
 					localStorage.setItem('active', result[0].active);

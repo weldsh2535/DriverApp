@@ -1,25 +1,45 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { environment } from 'src/environments/environment.prod';
 import { Account } from 'src/Table/table';
-import { AppError } from '../common/app-error';
-import { BadInput } from '../common/bad-input';
-import { NotFoundError } from '../common/not-found-error';
-
+import { catchError, tap } from 'rxjs/operators';
+import { Http, HttpOptions } from '@capacitor-community/http';
+import { from } from 'rxjs'
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
 
   readonly APIURL = environment.apiURL;
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient
+  ) {
   }
-  create(val: any) {
-    return this.http.post(this.APIURL + '/account', val);
+  doGet(url) {
+    const options: HttpOptions = {
+      url
+    };
+    return from(Http.get(options));
+  }
+  doPost(url): Observable<any> {
+    const options: HttpOptions = {
+      url,
+      method: 'POST'
+    };
+    return from(Http.request(options));
+  }
+  // create(val: any) {
+  //   return this.http.post(this.APIURL + '/account', val);
+  // }
+  create(user: Account): Observable<any> {
+    return this.http.post(this.APIURL + '/account', user);
   }
   getAllAccount(): Observable<Account[]> {
-    return this.http.get<Account[]>(this.APIURL + '/account');
+    return this.http.get<Account[]>(this.APIURL + '/account')
+      .pipe(
+        tap(users => console.log('Users retrieved!')),
+        catchError(this.handleError<Account[]>('Get user', []))
+      );
   }
   updateAccount(val: any) {
     return this.http.put(this.APIURL + '/account', val);
@@ -28,16 +48,12 @@ export class AccountService {
     return this.http.delete(this.APIURL + '/account/' + id).toPromise();
   }
 
-  private handleError(error: Response) {
-    if (error.status === 400) {
-      return Observable.throw(new BadInput(error.json()));
-    }
-
-    if (error.status === 404) {
-      return Observable.throw(new NotFoundError());
-    }
-
-    return Observable.throw(new AppError(error));
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+      console.error(error);
+      console.log(`${operation} failed: ${error.message}`);
+      return of(result as T);
+    };
   }
 
 }

@@ -1,0 +1,11 @@
+<network-security-config>
+   <base-config cleartextTrafficPermitted="true">
+       <trust-anchors>
+           <certificates src="system" />
+       </trust-anchors>
+   </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain>localhost</domain>
+        <domain includeSubdomains="true">http://hdapi.mtksolutions.com</domain>
+    </domain-config>
+</network-security-config>
